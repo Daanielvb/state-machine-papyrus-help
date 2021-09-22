@@ -1,0 +1,7 @@
+JSON resource payload example:
+```
+{
+   "test":"string",
+   "test_name":"string"
+}
+```
