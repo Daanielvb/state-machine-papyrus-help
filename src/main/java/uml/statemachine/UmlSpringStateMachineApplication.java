@@ -1,23 +1,23 @@
-package test.umlspringstatemachine;
+package uml.statemachine;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.context.ConfigurableApplicationContext;
+import uml.statemachine.camel.SSMService;
 
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"uml.statemachine.*"})
 public class UmlSpringStateMachineApplication implements CommandLineRunner {
 	
 	private static ConfigurableApplicationContext context;
 
     @Autowired
-    private StateMachine<String, String> stateMachineOne;
-
-    @Autowired
-    private StateMachine<String, String> stateMachineTwo;
+    private SSMService stateMachineService;
 
     public static void main(String[] args) {
          context = SpringApplication.run(UmlSpringStateMachineApplication.class, args);
@@ -26,16 +26,18 @@ public class UmlSpringStateMachineApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-    	synchronized (stateMachineOne) {
-    		 stateMachineOne.getExtendedState().getVariables().put("foo", "machine1");
-    	     stateMachineOne.start();
+        final StateMachine machineOne = stateMachineService.acquireMachine("1", "one");
+        final StateMachine machineTwo = stateMachineService.acquireMachine("1", "two");
+    	synchronized (machineOne) {
+            machineOne.getExtendedState().getVariables().put("foo", "machine1");
+            machineOne.start();
 			 //stateMachineOne.wait();
 		}
        
-        synchronized (stateMachineTwo) {
-            if(stateMachineOne.isComplete()) {
-                stateMachineTwo.getExtendedState().getVariables().put("foo", (String)stateMachineOne.getExtendedState().getVariables().get("foo"));
-                stateMachineTwo.start();
+        synchronized (machineTwo) {
+            if(machineOne.isComplete()) {
+                machineTwo.getExtendedState().getVariables().put("foo", (String) machineOne.getExtendedState().getVariables().get("foo"));
+                machineTwo.start();
             }
 		}
         

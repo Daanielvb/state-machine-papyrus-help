@@ -1,4 +1,4 @@
-package test.umlspringstatemachine;
+package uml.statemachine.camel;
 
 import ch.qos.logback.classic.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;

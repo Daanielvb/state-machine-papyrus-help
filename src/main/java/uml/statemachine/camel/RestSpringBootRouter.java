@@ -1,4 +1,4 @@
-package test.umlspringstatemachine;
+package uml.statemachine.camel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.builder.RouteBuilder;
@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import static org.apache.camel.model.rest.RestParamType.body;
 
-import test.umlspringstatemachine.swagger_examples.ping.Ping;
-import test.umlspringstatemachine.swagger_examples.test.Test;
+import uml.statemachine.swagger_examples.ping.Ping;
+import uml.statemachine.swagger_examples.test.Test;
 
 /**
  * @author SP.
@@ -125,7 +125,7 @@ public class RestSpringBootRouter extends RouteBuilder {
                 .type(Test.class).param().name("body").type(body)
 				//.description(readJson.getJson("SSM_trigger_json_example.txt"))
 				.required(true).endParam()
-                .route().bean(new SSMService(), "TriggerSSM");
+                .route().bean(new SSMService(), "triggerSSM");
 				
 		rest("/SSM").description("Spring State Machine functions").consumes("application/json").produces("application/json")
 				// setup security definitions
@@ -154,7 +154,7 @@ public class RestSpringBootRouter extends RouteBuilder {
 						exchange.getIn().setBody(map);
                     }
                 })
-                .bean(new SSMService(), "TriggerSSM");
+                .bean(new SSMService(), "triggerSSM");
 
 
     }

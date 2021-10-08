@@ -1,4 +1,4 @@
-package test.umlspringstatemachine;
+package uml.statemachine.camel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,29 +8,42 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.service.StateMachineService;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class SSMService {
 
     @Autowired
-    private StateMachineFactory<String, String> stateMachineFactory;
+    @Qualifier(value="config_one")
+    private StateMachineFactory<String, String> stateMachineFactoryOne;
 
     @Autowired
-    private StateMachine<String, String> stateMachineOne;
-
-    @Autowired
-    private StateMachine<String, String> stateMachineTwo;
+    @Qualifier(value="config_two")
+    private StateMachineFactory<String, String> stateMachineFactoryTwo;
 
     public SSMService() {
     }
 
-    public void TrigerSSM(Exchange exchange) {
+    public StateMachine<String, String> acquireMachine(String id, String version){
+        if (version.equals("one")){
+            return stateMachineFactoryOne.getStateMachine(id);
+        }
+        else{
+            return stateMachineFactoryTwo.getStateMachine(id);
+        }
+    }
+
+    public void triggerSSM(Exchange exchange) {
 
         Message camelMessage = exchange.getIn();
         //System.out.println(camelMessage.getBody());
@@ -55,11 +68,9 @@ public class SSMService {
                 System.out.println(test);
 
                 if (test.equals("START")) {
-					
-                    stateMachineOne = this.stateMachineFactory.getStateMachine("machineone");
+                    final StateMachine<String, String> stateMachineOne = this.stateMachineFactoryOne.getStateMachine("machineone");
                     stateMachineOne.getExtendedState().getVariables().put("foo", "machine1");
                     stateMachineOne.start();
-
                 }
             }
 
